@@ -10,7 +10,7 @@ public class SeatAllocation {
 		/**
 		 * Getting Input from user: Size of plane and passengerCount
 		 */
-		String sizeOfPlane="[3,2], [4,3], [2,3], [3,4]";
+		String sizeOfPlane="[3,2], [4,3], [2,3], [3,5]";
 		int passengerCount=36;
 		
 		/**
@@ -22,6 +22,7 @@ public class SeatAllocation {
 		if(Objects.nonNull(divArr)) {
 			devLength=divArr.length;
 		}
+		int maxRow=0;
 		for (int i=0;i<devLength;i++) {
 			String[] divIJ = divArr[i].split(",");
 		
@@ -38,32 +39,35 @@ public class SeatAllocation {
 				}else {
 					listofDiv.add(new Division(iObj, jObj,false,false));
 				}
+				if(maxRow<jObj) {
+					maxRow=jObj;
+				}
 				
 			}
 			
 			
 		}
 		
-		
+		System.out.println("maxRow:"+maxRow);
 		String seatType="A";
 		for(int i=1;i<=passengerCount;i++) {
 
 			if(seatType.equalsIgnoreCase("A")) {
-				if(isAvailable(i,listofDiv,"A")) {
+				if(isAvailable(i,listofDiv,"A",maxRow)) {
 					continue;
 				}else {
 					 seatType="W";
 				}
 			}
 			if(seatType.equalsIgnoreCase("W")) {
-				if(isAvailable(i,listofDiv,"W")) {
+				if(isAvailable(i,listofDiv,"W",maxRow)) {
 					continue;
 				}else {
 					 seatType="M";
 				}
 			}
 			if(seatType.equalsIgnoreCase("M")) {
-				if(isAvailable(i,listofDiv,"M")) {
+				if(isAvailable(i,listofDiv,"M",maxRow)) {
 					continue;
 				}
 			}
@@ -97,10 +101,10 @@ public class SeatAllocation {
 		
 	}
 	
-	public  static boolean isAvailable(int pid,List<Division> listofDiv,String type) {
+	public  static boolean isAvailable(int pid,List<Division> listofDiv,String type,int high) {
 		boolean isAvail=false;
 		
-		int high=4;
+		
 		
 		
 		for(int i=0;i<high;i++) {
