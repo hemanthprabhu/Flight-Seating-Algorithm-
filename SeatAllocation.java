@@ -1,20 +1,26 @@
 package com.airlines;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class SeatAllocation {
-	public static void main(String[] args) {
-		System.out.println("Airplane Seating Application");
+	public static void main(String[] args) throws IOException {
+		System.out.println("Airplane Seating Application\n");
 		/**
 		 * Getting Input from user: Size of plane and passengerCount
 		 */
-		String sizeOfPlane="[3,2], [4,3], [2,3], [3,5]";
-		int passengerCount=36;
+		String sizeOfPlane="[3,2], [4,3], [2,3], [3,4]";
+		//String sizeOfPlane="[3,2], [4,3]";
+		int passengerCount=32;
+		System.out.println("Total Passengers :"+passengerCount);
+		System.out.println("Flight Seating Specs :"+sizeOfPlane+"\n\n");
 		
 		/**
-		 * Initialize list of 2d Array and assign into list.
+		 * Starting: Initialize list of 2d Array and assign into list.
 		 */
 		List<Division> listofDiv=new ArrayList<Division>();
 		String[] divArr = sizeOfPlane.split(", " );
@@ -27,11 +33,9 @@ public class SeatAllocation {
 			String[] divIJ = divArr[i].split(",");
 		
 			if(Objects.nonNull(divIJ)&&divIJ.length==2) {
-				//System.out.println("i,j:"+divIJ[0]+divIJ[1]);
+			
 				Integer iObj=Integer.valueOf(divIJ[0].replace("[", ""));
 				Integer jObj=Integer.valueOf(divIJ[1].replace("]", ""));
-				
-				//Division div1=new Division(iObj, jObj,true,false);
 				if(i==0)
 					listofDiv.add(new Division(iObj, jObj,true,false));
 				else if(i+1==devLength) {
@@ -39,16 +43,22 @@ public class SeatAllocation {
 				}else {
 					listofDiv.add(new Division(iObj, jObj,false,false));
 				}
+				//Finding Max row in all divs
 				if(maxRow<jObj) {
 					maxRow=jObj;
 				}
 				
 			}
 			
-			
 		}
+		/**
+		 * Ending: Initialize list of 2d Array and assign into list.
+		 */
 		
-		System.out.println("maxRow:"+maxRow);
+		/**
+		 * Starting: Business Logic  to allocate passengers into seats based on business rules
+		 */
+		
 		String seatType="A";
 		for(int i=1;i<=passengerCount;i++) {
 
@@ -73,74 +83,77 @@ public class SeatAllocation {
 			}
 		}
 		
-//		isAvailable(1,listofDiv,"A");
-//		isAvailable(2,listofDiv,"A");
-	
+		/**
+		 * Ending: Business Logic  to allocate passengers into seats based on business rules
+		 */
+
 		
 		
-	
-		
-		
-		for (Division division : listofDiv) {
-			//division.print();
-			System.out.println("");
-			
-				for(int i=0;i<division.row;i++) {
-					for(int j=0;j<division.col;j++) {
-						//System.out.print(division.div[i][j]+",("+i+","+j+") ");
-						System.out.print(division.div[i][j]+",");
+		   
+	/**
+	 * STARTING:Printing into console and file
+	 */
+		FileWriter fw = new FileWriter("output.txt", true);
+		BufferedWriter bw = new BufferedWriter(fw);
+		  
+		for(int i=0;i<maxRow;i++) {
+			for (Division division : listofDiv) {
+				boolean isFirst=true;
+					for(int j=0;j<division.col&&i<division.row;j++) {
+						String val="";
+						if(isFirst){
+							isFirst=false;
+							 val=division.div[i][j];
+						}else {
+							 val=","+division.div[i][j];
+							
+						}
+						System.out.print(val);
+						bw.write(val);
 						
 					}
-					System.out.println("\t\t");
-				}
-			
-			
+					System.out.print("\t\t");
+					bw.write("\t\t");
+			}
+			System.out.println("");
+			bw.write("\n");
 		}
 		
+		
+	   bw.close();
+	
+	/**
+	 * Ending:Printing into console and file
+	*/
+				
 		
 		
 	}
-	
+	/**
+	 * 
+	 * @param pid
+	 * @param listofDiv
+	 * @param type
+	 * @param high
+	 * @return isAvail
+	 */
 	public  static boolean isAvailable(int pid,List<Division> listofDiv,String type,int high) {
-		boolean isAvail=false;
-		
-		
-		
 		
 		for(int i=0;i<high;i++) {
-		for (Division division : listofDiv) {
-			
-		
-				//System.out.println("division.row,col:"+division.row+","+division.col);
-			
-				
-				for(int j=0;j<division.col&&i<division.row&&!isAvail;j++) {
-					
-					
+			for (Division division : listofDiv) {
+				for(int j=0;j<division.col&&i<division.row;j++) {
 					if(!Util.isNumeric(division.div[i][j])) {
 						if( division.div[i][j].equalsIgnoreCase(type)) {
 							division.div[i][j]=String.valueOf(pid);
-							isAvail=true;
-							
+							return true;
 							
 						}
 					}
-					
-					//System.out.print(division.div[i][j]+",("+i+","+j+")\t");
-					
-					
 				
-				//System.out.println("");
-			
-			
+				}
 			}
 		}
-		}
-		
-			
-		
-		
-		return isAvail;
+		return false;
 		
 	}
 	
